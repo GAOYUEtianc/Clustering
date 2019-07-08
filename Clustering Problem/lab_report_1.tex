@@ -1,0 +1,366 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% University/School Laboratory Report
+% LaTeX Template
+% Version 3.1 (25/3/14)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Linux and Unix Users Group at Virginia Tech Wiki 
+% (https://vtluug.org/wiki/Example_LaTeX_chem_lab_report)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass{article}
+
+\usepackage[version=3]{mhchem} % Package for chemical equation typesetting
+\usepackage{siunitx} % Provides the \SI{}{} and \si{} command for typesetting SI units
+\usepackage{graphicx} % Required for the inclusion of images
+\usepackage{natbib} % Required to change bibliography style to APA
+\usepackage{amsmath} % Required for some math elements 
+\usepackage{float}
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+\renewcommand{\labelenumi}{\alph{enumi}.} % Make numbering in the enumerate environment by letter rather than number (e.g. section 6)
+
+%\usepackage{times} % Uncomment to use the Times New Roman font
+
+%----------------------------------------------------------------------------------------
+%	DOCUMENT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{A Comparison Among Several \\ Algorithms Solving\\ Clustering Problems} % Title
+
+\author{\textsc{GAO} Yue } % Author name
+
+\date{\today} % Date for the report
+
+\begin{document}
+
+\maketitle % Insert the title, author and date
+
+\begin{center}
+\begin{tabular}{l r}
+Date Performed: & June 21, 2017 \\ % Date the experiment was performed
+ % Partner names
+Instructor: & Professor Anthony So % Instructor/supervisor
+\end{tabular}
+\end{center}
+
+% If you wish to include an abstract, uncomment the lines below
+% \begin{abstract}
+% Abstract text
+% \end{abstract}
+
+%----------------------------------------------------------------------------------------
+%	SECTION 1
+%----------------------------------------------------------------------------------------
+
+\section{Objective}
+
+To find the difference among several algorithms which can solve clustering problems from several perspectives including time complexity and accuracy of running results. In this research, the objective function is :%(as defined in \ref{definitions})
+\begin{center}
+\begin{displaymath}
+\mathop{\arg\min}\limits_{S}\sum_{i=1}^{k}\sum_{x \in S_{i}}\parallel x-\mu_{i}\parallel ^{2}
+\end{displaymath}
+\end{center}
+Where ( $x_{1}$ $x_{2}$ ... $x_{n}$) are n vectors  which we want to divide into k clusters; $S_{1}$, $S_{2}$ ... $S_{k}$ are the sets representing k clusters, $\mu_{1}$, $\mu_{2}$ ... $\mu_{k}$ are the centroids of each cluster.
+% If you have more than one objective, uncomment the below:
+%\begin{description}
+%\item[First Objective] \hfill \\
+%Objective 1 text
+%\item[Second Objective] \hfill \\
+%Objective 2 text
+%\end{description}
+
+\subsection{Definitions}
+\label{definitions}
+\begin{description}
+\item[Clustering]
+Clustering is a data-mining technique used to place data elements into related groups without advance knowledge of the group definitions. This research focuses on clustering points in Euclidean coordinate. 
+\end{description} 
+ In this report, several clustering methods will be introduced and implementation will be  acted on them.
+%----------------------------------------------------------------------------------------
+%	SECTION 2
+%----------------------------------------------------------------------------------------
+\section{Introduction to Several Algorithms and Their Main Properties}
+\subsection{Kmeans Algorithm}
+Kmeans Algorithm is a typical unsupervised learning method, the implementation steps are as follows:\\
+\begin{enumerate}
+\begin{item}
+Randomly choose k cluster centroids $\mu_{1}$, $\mu_{2}$ ... $\mu_{k}$
+\end{item}
+\begin{item}
+Repeat the following processes until converge:\\
+For each i $\in$ $\{$1, 2 ... k$\}$, compute index of the cluster it belongs to by:\\
+\begin{displaymath}
+c^{(i)} := \mathop{\arg\min}\limits_{j}\parallel x^{(i)}-\mu_{j}\parallel ^{2}
+\end{displaymath}
+For each cluster j, re-compute its centroid by:\\
+\begin{displaymath}
+\mu_{j} := \frac{\sum_{i=1}^{m}1\{c^{(i)}=j\}x^{(i)}}{\sum_{i=1}^{m}1\{c^{(i)}=j\}}
+\end{displaymath}
+\end{item}
+\end{enumerate}
+Kmeans algorithm processes a number of advantages such as low time complexity, and an assurance of convergence. However, the clustering result may not be always good since Kmeans is sensitive to outliers, initial centroids chosen, shapes of clusters and so on.
+\subsection{Spectral Clustering}
+Spectral Clustering uses the eigenvalues of the similarity matrix of data to perform dimensionality reduction before clustering in fewer dimensions:\\
+Given a set of points S = $\{$$s_{1}$,...,$s_{n}$$\}$ in $R^{l}$ that we want to cluster into k subsets:
+\begin{enumerate}
+\begin{item}
+Form the affinity matrix A $\in$ $R^{n \times n}$ defined by \begin{displaymath}A_{ij} = exp(-\parallel s_{i} - s_{j}\parallel ^{2}/2\sigma ^{2})  \qquad       if \qquad i \ne  j,
+\end{displaymath}and $A_{ii}$ = 0. (Here the scaling parameter $\sigma ^{2}$ controls how rapidly the affinity $A_{ij}$ falls off with the distance between $s_{i}$ and $s_{j}$).
+\end{item}
+\begin{item}
+Define D to be the diagonal matrix whose (i,i)-element is the sum of A's i-th row, and construct the matrix L = $D^{-1/2}$A$D^{-1/2}$.
+\end{item}
+\begin{item}
+Find $x_{1}$, $x_{2}$,..., $x_{k}$, the k largest eigenvectors of L (chosen to be orthogonal to each other in the case of repeated eigenvalues), and form the matrix X = [$x_{1}$$x_{2}$...$x_{k}$] $\in$ $R^{n \times k}$ by stacking the eigenvectors in columns.
+\end{item}
+\begin{item}
+Form the matrix Y from X by renormalizing each of X's rows to have unit length.
+\end{item}
+\begin{item}
+Treating each row of Y as a point in $R^{k}$, cluster them into k clusters via K-means or any other algorithm (that attempts to minimize distortion).
+\end{item}
+\begin{item}
+Finally, assign the original point $s_{i}$ to cluster j if and only if row i of the matrix Y was assigned to cluster j.
+\end{item}
+\end{enumerate}
+In this algorithm, the eigenvector is seen as solving a relaxation of an NP-hard discrete graph partitioning problem. Spectral clustering is less sensitive to outliers than K-means algorithm, so the performance of spectral clustering is usually better than K-means. Besides, spectral clustering adapts to non-convex data well. When solving high-dimensional clustering problems, time complexity of spectral clustering is usually lower than that of K-means.
+\subsection{Mixed Integer Programming Approach}
+The mathematical programming model, MIP-Diameter, of the clustering problem is given below:\\
+minimize     \qquad      Z=$D_{max}$\\
+subject to    \begin{displaymath}  D_{l}\ge (\sum_{i,j=1}^{n} d_{ij}x_{il}x_{jl})/(|C_{l}|(|C_{l}-1|)) \qquad \forall l, l=1,...,k, \end{displaymath}
+\begin{displaymath}
+\sum_{l=1}^{k}x_{il} = 1 \qquad \forall i,\qquad i = 1,..., n,
+\end{displaymath}
+\begin{displaymath}
+D_{max} \ge \sum_{l=1}^{k}D_{l}
+\end{displaymath}
+\begin{displaymath}
+x_{il}  \in  \{0, 1\} \qquad \quad \forall i,l,\quad i=1,..., n, \quad l=1,..., k,
+\end{displaymath}
+\begin{displaymath}
+|C_{l}| = \sum_{i=1}^{n}x_{il}
+\end{displaymath}
+\begin{displaymath}
+D_{l} \ge 0\qquad \quad \forall l, \qquad l = 1,..., k.
+\end{displaymath} 
+The main disadvantage of MIP is high time complexity, a common method to reduce time complexity is to fix some points (seeds) before solving the MIP model, we now present an algorithm to fix seeds :\\
+\begin{enumerate}
+\begin{item}
+Set iteration number t=0.\\
+Set lower and upper bounds to l(t) = min\{$d_{ij}$\}, u(t) = max\{$d_{ij}$\}.
+\end{item}
+\begin{item}
+Set R(t) = $\frac{l{t}+u(t)}{2}$.
+\end{item}
+\begin{item}
+Construct the graph $G_{R(t)}$ where instances correspond to vertices, and the edge (i,j) $\in$ E, if $d_{ij}$ $\le$ R(t).
+\end{item}
+\begin{item}
+Find a maximal independent set S in $G_{R(t)}$.\\
+If $\mid$S$\mid$ = k, then go to Step 2.\\
+If $\mid$S$\mid$ $<$ k, then set l(t + 1) = l(t), u(t + 1) = R(t), t = t + 1 and go to Step b.\\
+If $\mid$S$\mid$ $>$ k, then set l(t + 1) = R(t), u(t + 1) = u(t), t = t + 1 and go to Step b.
+\end{item}
+\end{enumerate}
+After the above steps, each cluster will have a fixed seed, thus improving the efficiency of the MIP model. However, the time complexity of this algorithm is still large. Despite the accuracy of MIP, when dataset is large, this algorithm is not proper for solving this problem. 
+\subsection{Neuron Network}
+In this part, SOM (Self-Organizing Map) model will be used to solve the problem. A typical SOM network is consisted of 2 layers, input layer analogs retina, while output layer (also called map) analogs Cerebral cortex. SOM is trained using unsupervised learning to produce a discretized representation of the input space of the training samples. Associated with each neuron are a weighted vector of the same dimension as the input data vectors, the idea for placing a vector from data space onto the map is to find the neuron with the closest weight vector to the data space vector. The update formula for a neuron v with weight vector $W_{v}$(s) is \begin{displaymath}
+W_{v}(s+1) = W_{v}(s) + \theta(u,v,s) \cdot (D(t) - W_{v}(s))\end{displaymath}
+where t is an index into the training sample, s is the step index, u is the index of the BMU (best matching unit) for D(t), D(t) is the input vector, $\theta$(u,v,s) is the neighborhood function which gives the distance between the neuron v and neuron u in step s, $\alpha$(s) is a monotonically decreasing learning coefficient.\\
+The algorithm is as follow:
+\begin{enumerate}
+\begin{item}
+Initialize iteration times, input vector, initial weight vector (generate randomly), initial position of neurons and learning rate.
+\end{item}
+\begin{item}
+Traverse each input vector, compute the winning neuron according to the Euclidean distance between neurons and vectors. 
+\end{item}
+\begin{item}
+Update weight vector by the formula mentioned above:\begin{displaymath}
+W_{v}(s+1) = W_{v}(s) + \theta(u,v,s) \cdot (D(t) - W_{v}(s))\end{displaymath}
+\end{item}
+\begin{item}
+Updating learning rate and neighbor function.
+\end{item}
+\begin{item}
+When the number of iterations reaches the set times, end, otherwise update s and return to step b.
+\end{item}
+\end{enumerate}
+In this approach, the initialization of parameters is important, with proper learning coefficient fixed, the performance of this algorithm will be quite accurate and time complexity is much smaller than MIP model. Unlike K-means algorithm, which stops as soon as it converges, SOM posseses an important property that it will keep learning and stop only if the number of iterations has reached the bound. In summary, SOM is an appropriate model for solving clustering problems. Disadvantages of SOM is that the parameters need to be adjusted, and although in most cases it converges, actually SOM does not always converge. 
+
+\subsection{Hierarchical Methods}
+The main difference between this method and others is that this method does not need to fix number of clusters in the first, it only need a lower bound or an upper bound for the number of clusters. Strateties generally fall into two types: Agglomerative ("bottom-up", each point stars in its own cluster) and Divisive ("top down", all points start in one cluster). We only focus on agglomerative methods here.\\
+There are different kinds of agglomerative methods, in the general case, the time complexity of agglomerative clustering is O($n^{2}$log(n)), for some special cases, optimal efficient agglomerative methods of complexity O($n^{2}$) are known. Here, we introduce an agglomerative algorithm (centroid clustering) of time complexity O($n^{2}$log(n)):\\
+Firstly, according to the objective formula, the distance/similarity parameter between two clusters is defined as follow:
+\begin{displaymath}
+d(C_{i},C_{j}) = \vec{\mu}(C_{i}) \cdot \vec{\mu}(C_{j}) = (\frac{1}{N_{i}}\sum_{d_{m}\in C{i}}\vec{d_{m}})\cdot (\frac{1}{N_{j}}\sum_{d_{n}\in C{j}}\vec{d_{n}}) = \frac{1}{N_{i}N_{j}}\sum_{d_{m}\in C_{i}}\sum_{d_{n}\in C_{j}}\vec{d_{m}}\cdot \vec{d_{n}}
+\end{displaymath}
+The algorithm is as follows:
+\begin{enumerate}
+\begin{item}
+Set an expected maximum of the number of clusters.
+\end{item}
+\begin{item}
+See each point as a cluster $C_{i}$, i = 1 to n.
+\end{item}
+\begin{item}
+Find the clusters $C_{i}$ and $C_{j}$ such that among all pairs of the clusters, d($C_{i}$, $C_{j}$) is the smallest.
+\end{item}
+\begin{item}
+collapse $C_{i}$ and $C_{j}$ as one cluster.
+\end{item}
+\begin{item}
+If the number of clusters is larger than the expected maximum number, return to step c.
+\end{item}
+\end{enumerate} 
+\section{Experimental Data}
+Implementation for the above algorithms was did on 3000 points in 2-D. (But for MIP algorithm, since the time complexity is too large, the implementation for it is on only 81 points)
+\subsection{Kmeans}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{Kmeans_figure.jpg}
+\caption{Result of K-means Algorithm}\label{fig1}
+\end{figure}
+The elapsed time is 2.358390 seconds.\\
+As shown in the figure, under K-means algorithm, the clustering result is not accurate since it converges too fast. The advantage is that the time cost is little.
+\subsection{Spectral Clustering}
+Performance of this algorithm under different coefficients were tested and compared:\\ 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{spectral500.jpeg}
+\caption{Result of Spectral Clustering Algorithm when coefficient is 500, the total elapsed time is 11.5325 seconds.}\label{fig2}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{spectralCluster.jpg}
+\caption{Result of Spectral Clustering Algorithm when coefficient is 1000, the total elapsed time is 9.5933 seconds.}\label{fig3}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{spectral1500.jpg}
+\caption{Result of Spectral Clustering Algorithm when coefficient is 1500, the total elapsed time is 8.9665 seconds.}\label{fig4}
+\end{figure}
+From the figure 2 to 4, it can be shown that the performance of spectral clustering is better than Kmeans since the boundaries of clusters are well divided, and the time cost is little, however, the performance is not good enough since the sizes of the clusters are so different. This maybe due to that the most important advantage of Spectral Clustering is dimensionality reduction, which means that it performs better when the dimensional number is larger than k. In this dataset, the dimensional number is 2, k is 20, hence, the advantage of Spectral Clustering is not shown in this example, but in high dimensional case, it might perform better and the time cost would be even smaller than Kmeans.
+\subsection{MIP}
+Since the time complexity of MIP is too big, implementation was did only on 81 points shown in figure 5.\\
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{MIP.jpg}
+\caption{Data points}\label{fig5}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{MIPresult.jpg}
+\caption{Result of MIP without seeds and reassignment, the elapsed time is 15.6 seconds}\label{fig5}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{MIPresult.jpg}
+\caption{Result of the advanced MIP model with seeds fixed, the elapsed time is 1.4 seconds}\label{fig5}
+\end{figure}
+As shown in figure 6-7, it is clear that the performance of MIP is rather accurate if the shapes of clusters are convex enough, and fixing seeds before solving the MIP can largely reduce time cost.
+\subsection{Neuron Network}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{NN.jpg}
+\caption{Result of SOM Algorithm when iteration time is 3000, the total elapsed time is 382.42285 seconds.}\label{fig5}
+\end{figure}
+It can be seen from the figure that after iterating for 3000 times, the performance of SOM is very good, the time cost is larger compared to Kmeans and Spectral Clustering, but overall, SOM Algorithm is quite proper for solving this problem.
+\subsection{Hierarchical Methods}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{Hiera.jpg}
+\caption{Result of Hierarchical Method, the total elapsed time is 3.608544 seconds.}\label{fig5}
+\end{figure}
+The performance of the agglomerative algorithm is  accurate, and the time cost is quite low, it could be claimed that agglomerative algorithm solves the objective problem very well. %----------------------------------------------------------------------------------------
+%	SECTION 44
+%----------------------------------------------------------------------------------------
+
+\section{Results and Conclusions}
+%table of time complexity
+The time complexity of the five algorithms introduced are listed as follows:\\ \\
+\begin{tabular}{|c|c|}
+\hline
+Algorithm & Time Compexity\\
+\hline
+Kmeans & O(knlt) (t is the number if iterations)\\
+\hline
+Spectral Clustering & O($n^{3}$)\\
+\hline
+MIP model & O($2^{n}$)\\
+\hline
+SOM & O(knlt) (t is the number if iterations)\\
+\hline
+Agglomerative Method & O($n^{2}$log(n))\\
+\hline
+\end{tabular}
+\\ \\
+Seen from the implementations results on 3000 points, for the above algorithms, the Hierarchical Method and Neuron Network (SOM) algorithm performs most accurately, and the time costs are acceptable. In summary, when the size of dataset is large and the number of clusters are known as pre-request, SOM is a good choice. When number of clusters is not known or the shapes of clusters are unpredictable, hierarchical methods would perform better. When the size of dataset is small, MIP can accurately solve the problem. When the dimensional number of the dataset is high, spectral clustering would be efficient in solving such problem. K-means algorithm is also an efficient algorithm but the choice of initial centroids is essential, fixing seeds for K-means algorithm may improve the performance of it. 
+%----------------------------------------------------------------------------------------
+%	SECTION 5
+%----------------------------------------------------------------------------------------
+
+\section{Discussion of Experimental Uncertainty}
+For the objective formula, the purpose is to gather points as close to centroids of clusters as possible, which performs good when the clusters are all convex, however, in reality, there are many non-convex cases in clustering problems. Besides, other than distances between points,there are many different criterias in defining a 'good' cluster, for example, the maximum diameter of clusters, the density of clusters and so on. Under different criterias the objective formulas are different, leading to quite different results.
+\subsection{non-convex clustering}
+There are cases that the shapes of clusters are not strictly convex, for instance, the dataset shown in figure 10. \\
+In fact, in this case, the above methods can also be used but the Euclidean distance should not be the criteria in the algorithms, other metrics such as kernel distance could be applied. For instance, as shown in figure 11, hierarchical methods are able to solve such a problem, as long as the definition of the distance/similarity parameter is changed (for example, algorithm for computing linkages of clusters is changed from 'centroid' to 'single' in Matlab).
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{spiral.jpg}
+\caption{Spiral Dataset of 312 points}\label{fig5}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{spiralHie.jpg}
+\caption{Result of Hierarchical Method, the total elapsed time is 0.020246 seconds.}\label{fig5}
+\end{figure}
+
+%----------------------------------------------------------------------------------------
+%	SECTION 6
+%----------------------------------------------------------------------------------------
+\newpage
+\section{References}
+
+\begin{enumerate}
+\begin{item}
+Christopher D. Manning, Prabhakar Raghavan and Hinrich Schütze, Introduction to Information Retrieval, Cambridge University Press. 2008.
+\end{item}
+\begin{item}
+Andrew Y.Ng, Michael I.Jordan and Yair Weiss. On Spectral Clustering: Analysis and an Algorithm. In Advances in Neural Information Processing Systems 14, pages 849-859, 2002.
+\end{item}
+\begin{item}
+Burcu Saglam, F. Sibel Salman, Serpil Sayin and Metin Turkay. A mixed-integer programming approach to the clustering problem with an application in customer segmentation[J]. European Journal of Operational Research, 2006, 173(3): 866-879.
+\end{item}
+\begin{item}
+A. Likas, N. Vlassis, J.J. Verbeek, The global K-Means clustering algorithm, Pattern Recognition 36 (2003) 451-461.
+\end{item}
+\begin{item}
+Vikas Chaudhary, R.S. Bhatia, and Anil K. Ahlawat, A novel Self-Organizing Map (SOM) learning algorithm with nearest and farthest neurons[J]. Alexandria Engineering Journal, 2014, 53(4): 827-831.
+\end{item}
+\end{enumerate}
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+\bibliographystyle{apalike}
+
+\bibliography{sample}
+
+%----------------------------------------------------------------------------------------
+
+
+\end{document}
